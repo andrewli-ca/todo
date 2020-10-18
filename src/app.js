@@ -19,12 +19,13 @@ const data = [
 
 function App() {
   const [todos, setTodos] = React.useState(data)
+  const [todoInput, setTodoInput] = React.useState('')
 
   return (
     <div className="max-w-md mx-auto flex flex-col p-6 bg-gray-100 mt-10 rounded-lg shadow-xl">
       <div className="pt-1">
         <h1 className="text-2xl text-blue-900 leading-tight font-bold">
-          <span role="img" aria-label="rocket">
+          <span role="img" aria-label="rocket" className="mr-2">
             🚀
           </span>
           todos
@@ -36,15 +37,21 @@ function App() {
             className="appearance-none inline-block  w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
             type="text"
             placeholder="What needs to be done?"
+            value={todoInput}
+            onChange={e => {
+              setTodoInput(e.target.value)
+            }}
           />
           <div className="inline-block my-auto ml-4">
             <button
               className="focus:outline-none"
               onClick={() => {
-                setTodos([
-                  ...todos,
-                  {id: todos.length + 1, text: `todo #${todos.length + 1}`},
-                ])
+                if (todoInput === '') {
+                  return
+                }
+
+                setTodos([...todos, {id: todos.length + 1, text: todoInput}])
+                setTodoInput('')
               }}
             >
               <AddIcon className="h-6" />
