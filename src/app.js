@@ -18,8 +18,9 @@ const data = [
 ]
 
 function App() {
+  console.log('APp')
   const [todos, setTodos] = React.useState(data)
-  const [todoInput, setTodoInput] = React.useState('')
+  const input = React.useRef(null)
 
   return (
     <div className="max-w-md mx-auto flex flex-col p-6 bg-gray-100 mt-10 rounded-lg shadow-xl">
@@ -37,21 +38,21 @@ function App() {
             className="appearance-none inline-block  w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
             type="text"
             placeholder="What needs to be done?"
-            value={todoInput}
-            onChange={e => {
-              setTodoInput(e.target.value)
-            }}
+            ref={input}
           />
           <div className="inline-block my-auto ml-4">
             <button
               className="focus:outline-none"
               onClick={() => {
-                if (todoInput === '') {
+                if (input.current.value === '') {
                   return
                 }
 
-                setTodos([...todos, {id: todos.length + 1, text: todoInput}])
-                setTodoInput('')
+                setTodos([
+                  ...todos,
+                  {id: todos.length + 1, text: input.current.value},
+                ])
+                input.current.value = ''
               }}
             >
               <AddIcon className="h-6" />
