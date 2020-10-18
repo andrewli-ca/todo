@@ -1,18 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './tailwind.generated.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './tailwind.generated.css'
 
 const App = () => (
- <div className="tw-max-w-md tw-mx-auto tw-flex tw-p-6 tw-bg-gray-100 tw-mt-10 tw-rounded-lg tw-shadow-xl">
-    <div className="tw-ml-6 tw-pt-1">
-      <h1 className="tw-text-2xl tw-text-blue-700 tw-leading-tight">
+  <div className="max-w-md mx-auto flex p-6 bg-gray-100 mt-10 rounded-lg shadow-xl">
+    <div className="ml-6 pt-1">
+      <h1 className="text-2xl text-blue-700 leading-tight">
         Tailwind and Create React App
       </h1>
-      <p className="tw-text-base tw-text-gray-700 tw-leading-normal">
+      <p className="text-base text-gray-700 leading-normal">
         Building apps together
       </p>
     </div>
   </div>
-);
+)
 
-ReactDOM.render(<App />, document.querySelector('#root'));
+ReactDOM.render(<App />, document.querySelector('#root'))
