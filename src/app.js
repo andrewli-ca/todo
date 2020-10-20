@@ -1,4 +1,6 @@
 import React from 'react'
+import {v4 as uuidv4} from 'uuid'
+import clsx from 'clsx'
 import AddIcon from 'assets/add-solid.svg'
 import CheckMarkIcon from 'assets/checkmark.svg'
 import EditIcon from 'assets/edit-pencil.svg'
@@ -6,16 +8,19 @@ import DeleteIcon from 'assets/trash.svg'
 
 const data = [
   {
-    id: 1,
+    id: uuidv4(),
     text: 'test todo 1',
+    isCompleted: false,
   },
   {
-    id: 2,
+    id: uuidv4(),
     text: 'another todo',
+    isCompleted: false,
   },
   {
-    id: 3,
+    id: uuidv4(),
     text: 'and another one',
+    isCompleted: true,
   },
 ]
 
@@ -51,7 +56,7 @@ function App() {
 
                 setTodos([
                   ...todos,
-                  {id: todos.length + 1, text: input.current.value},
+                  {id: uuidv4(), text: input.current.value, isCompleted: false},
                 ])
                 input.current.value = ''
               }}
@@ -66,17 +71,36 @@ function App() {
           return (
             <div className="p-4 border" key={todo.id}>
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex">
                   <div className="inline-block">
-                    <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center">
-                      <img
-                        src={CheckMarkIcon}
-                        className="h-3"
-                        alt="Mark as Completed"
-                      />
+                    <button
+                      className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
+                      onClick={() => {
+                        const newTodos = todos.map(t => {
+                          if (t.id === todo.id) {
+                            t.isCompleted = !t.isCompleted
+                          }
+                          return t
+                        })
+                        setTodos(newTodos)
+                      }}
+                    >
+                      {todo.isCompleted ? (
+                        <img
+                          src={CheckMarkIcon}
+                          className="h-3"
+                          alt="Mark as Completed"
+                        />
+                      ) : null}
                     </button>
                   </div>
-                  <div className="inline-block ml-4 my-auto">{todo.text}</div>
+                  <div
+                    className={clsx('inline-block ml-4 my-auto', {
+                      'line-through': todo.isCompleted,
+                    })}
+                  >
+                    {todo.text}
+                  </div>
                 </div>
                 <div className="flex">
                   <div>
@@ -85,7 +109,13 @@ function App() {
                     </button>
                   </div>
                   <div className="ml-4">
-                    <button className="focus:outline-none">
+                    <button
+                      className="focus:outline-none"
+                      onClick={() => {
+                        const newTodos = todos.filter(t => t.id !== todo.id)
+                        setTodos(newTodos)
+                      }}
+                    >
                       <img src={DeleteIcon} className="h-4" alt="Delete Todo" />
                     </button>
                   </div>
