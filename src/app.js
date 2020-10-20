@@ -1,6 +1,8 @@
 import React from 'react'
-import {ReactComponent as AddIcon} from 'assets/add-solid.svg'
-import {ReactComponent as CheckMarkIcon} from 'assets/checkmark.svg'
+import AddIcon from 'assets/add-solid.svg'
+import CheckMarkIcon from 'assets/checkmark.svg'
+import EditIcon from 'assets/edit-pencil.svg'
+import DeleteIcon from 'assets/trash.svg'
 
 const data = [
   {
@@ -18,7 +20,6 @@ const data = [
 ]
 
 function App() {
-  console.log('APp')
   const [todos, setTodos] = React.useState(data)
   const input = React.useRef(null)
 
@@ -35,7 +36,7 @@ function App() {
       <div className="mt-8">
         <div className="w-full mb-6 md:mb-0 flex">
           <input
-            className="appearance-none inline-block  w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
+            className="appearance-none inline-block w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
             type="text"
             placeholder="What needs to be done?"
             ref={input}
@@ -55,7 +56,7 @@ function App() {
                 input.current.value = ''
               }}
             >
-              <AddIcon className="h-6" />
+              <img src={AddIcon} className="h-6" alt="Add New Todo" />
             </button>
           </div>
         </div>
@@ -63,16 +64,34 @@ function App() {
       <div className="mt-4">
         {todos.map(todo => {
           return (
-            <li className="list-none p-4 border" key={todo.id}>
-              <div className="flex items-center">
-                <div className="inline-block">
-                  <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center">
-                    <CheckMarkIcon className="h-3" />
-                  </button>
+            <div className="p-4 border" key={todo.id}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="inline-block">
+                    <button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center">
+                      <img
+                        src={CheckMarkIcon}
+                        className="h-3"
+                        alt="Mark as Completed"
+                      />
+                    </button>
+                  </div>
+                  <div className="inline-block ml-4 my-auto">{todo.text}</div>
                 </div>
-                <div className="inline-block ml-4 my-auto">{todo.text}</div>
+                <div className="flex">
+                  <div>
+                    <button className="focus:outline-none">
+                      <img src={EditIcon} className="h-4" alt="Edit Todo" />
+                    </button>
+                  </div>
+                  <div className="ml-4">
+                    <button className="focus:outline-none">
+                      <img src={DeleteIcon} className="h-4" alt="Delete Todo" />
+                    </button>
+                  </div>
+                </div>
               </div>
-            </li>
+            </div>
           )
         })}
       </div>
