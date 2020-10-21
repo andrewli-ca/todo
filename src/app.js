@@ -43,31 +43,19 @@ function App() {
     input.current.value = ''
   }
 
-  function handleCompleteTodo(todo) {
-    const newTodos = todos.map(t => {
-      if (t.id === todo.id) {
-        t.isCompleted = !t.isCompleted
-      }
-      return t
-    })
-    setTodos(newTodos)
-  }
-
   function handleDeleteTodo(todo) {
     const newTodos = todos.filter(t => t.id !== todo.id)
     setTodos(newTodos)
   }
 
-  function handleEditTodo(todo) {
+  function handleUpdateTodo(todo) {
     const newTodos = todos.map(t => {
       if (t.id === todo.id) {
         return todo
-      } else {
-        return t
       }
+      return t
     })
     setTodos(newTodos)
-    setEditTodo(null)
   }
 
   return (
@@ -116,7 +104,8 @@ function App() {
                       <button
                         className="focus:outline-none"
                         onClick={() => {
-                          handleEditTodo(editTodo)
+                          handleUpdateTodo(editTodo)
+                          setEditTodo(null)
                         }}
                       >
                         <img src={SaveIcon} className="h-4" alt="Save Todo" />
@@ -145,7 +134,10 @@ function App() {
                       <button
                         className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
                         onClick={() => {
-                          handleCompleteTodo(todo)
+                          handleUpdateTodo({
+                            ...todo,
+                            isCompleted: !todo.isCompleted,
+                          })
                         }}
                       >
                         {todo.isCompleted ? (
