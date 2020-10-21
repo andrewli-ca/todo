@@ -5,6 +5,8 @@ import AddIcon from 'assets/add-solid.svg'
 import CheckMarkIcon from 'assets/checkmark.svg'
 import EditIcon from 'assets/edit-pencil.svg'
 import DeleteIcon from 'assets/trash.svg'
+import SaveIcon from 'assets/save-disk.svg'
+import CloseIcon from 'assets/close.svg'
 
 const data = [
   {
@@ -26,7 +28,47 @@ const data = [
 
 function App() {
   const [todos, setTodos] = React.useState(data)
+  const [editTodo, setEditTodo] = React.useState(null)
   const input = React.useRef(null)
+
+  function handleAddTodo() {
+    if (input.current.value === '') {
+      return
+    }
+
+    setTodos([
+      ...todos,
+      {id: uuidv4(), text: input.current.value, isCompleted: false},
+    ])
+    input.current.value = ''
+  }
+
+  function handleCompleteTodo(todo) {
+    const newTodos = todos.map(t => {
+      if (t.id === todo.id) {
+        t.isCompleted = !t.isCompleted
+      }
+      return t
+    })
+    setTodos(newTodos)
+  }
+
+  function handleDeleteTodo(todo) {
+    const newTodos = todos.filter(t => t.id !== todo.id)
+    setTodos(newTodos)
+  }
+
+  function handleEditTodo(todo) {
+    const newTodos = todos.map(t => {
+      if (t.id === todo.id) {
+        return todo
+      } else {
+        return t
+      }
+    })
+    setTodos(newTodos)
+    setEditTodo(null)
+  }
 
   return (
     <div className="max-w-md mx-auto flex flex-col p-6 bg-gray-100 mt-10 rounded-lg shadow-xl">
@@ -49,17 +91,7 @@ function App() {
           <div className="inline-block my-auto ml-4">
             <button
               className="focus:outline-none"
-              onClick={() => {
-                if (input.current.value === '') {
-                  return
-                }
-
-                setTodos([
-                  ...todos,
-                  {id: uuidv4(), text: input.current.value, isCompleted: false},
-                ])
-                input.current.value = ''
-              }}
+              onClick={() => handleAddTodo()}
             >
               <img src={AddIcon} className="h-6" alt="Add New Todo" />
             </button>
@@ -67,60 +99,100 @@ function App() {
         </div>
       </div>
       <div className="mt-4">
-        {todos.map(todo => {
+        {todos.map((todo, i) => {
           return (
             <div className="p-4 border" key={todo.id}>
-              <div className="flex items-center justify-between">
-                <div className="flex">
-                  <div className="inline-block">
-                    <button
-                      className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
-                      onClick={() => {
-                        const newTodos = todos.map(t => {
-                          if (t.id === todo.id) {
-                            t.isCompleted = !t.isCompleted
-                          }
-                          return t
-                        })
-                        setTodos(newTodos)
-                      }}
-                    >
-                      {todo.isCompleted ? (
+              {todo?.id === editTodo?.id ? (
+                <div className="flex items-center justify-between">
+                  <input
+                    type="text"
+                    value={editTodo.text}
+                    onChange={e => {
+                      setEditTodo({...todo, text: e.target.value})
+                    }}
+                  />
+                  <div className="flex">
+                    <div>
+                      <button
+                        className="focus:outline-none"
+                        onClick={() => {
+                          handleEditTodo(editTodo)
+                        }}
+                      >
+                        <img src={SaveIcon} className="h-4" alt="Save Todo" />
+                      </button>
+                    </div>
+                    <div className="ml-4">
+                      <button
+                        className="focus:outline-none"
+                        onClick={() => {
+                          setEditTodo(null)
+                        }}
+                      >
                         <img
-                          src={CheckMarkIcon}
-                          className="h-3"
-                          alt="Mark as Completed"
+                          src={CloseIcon}
+                          className="h-4"
+                          alt="Close Edit Mode"
                         />
-                      ) : null}
-                    </button>
-                  </div>
-                  <div
-                    className={clsx('inline-block ml-4 my-auto', {
-                      'line-through': todo.isCompleted,
-                    })}
-                  >
-                    {todo.text}
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex">
-                  <div>
-                    <button className="focus:outline-none">
-                      <img src={EditIcon} className="h-4" alt="Edit Todo" />
-                    </button>
-                  </div>
-                  <div className="ml-4">
-                    <button
-                      className="focus:outline-none"
-                      onClick={() => {
-                        const newTodos = todos.filter(t => t.id !== todo.id)
-                        setTodos(newTodos)
-                      }}
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex">
+                    <div className="inline-block">
+                      <button
+                        className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
+                        onClick={() => {
+                          handleCompleteTodo(todo)
+                        }}
+                      >
+                        {todo.isCompleted ? (
+                          <img
+                            src={CheckMarkIcon}
+                            className="h-3"
+                            alt="Mark as Completed"
+                          />
+                        ) : null}
+                      </button>
+                    </div>
+                    <div
+                      className={clsx('inline-block ml-4 my-auto', {
+                        'line-through': todo.isCompleted,
+                      })}
                     >
-                      <img src={DeleteIcon} className="h-4" alt="Delete Todo" />
-                    </button>
+                      {todo.text}
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div>
+                      <button
+                        className="focus:outline-none"
+                        onClick={() => {
+                          setEditTodo(todo)
+                        }}
+                      >
+                        <img src={EditIcon} className="h-4" alt="Edit Todo" />
+                      </button>
+                    </div>
+                    <div className="ml-4">
+                      <button
+                        className="focus:outline-none"
+                        onClick={() => {
+                          handleDeleteTodo(todo)
+                        }}
+                      >
+                        <img
+                          src={DeleteIcon}
+                          className="h-4"
+                          alt="Delete Todo"
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )
         })}
