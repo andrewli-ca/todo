@@ -27,6 +27,7 @@ const data = [
 ]
 
 function App() {
+  console.log('App')
   const [todos, setTodos] = React.useState(data)
   const [editTodo, setEditTodo] = React.useState(null)
   const input = React.useRef(null)
@@ -89,32 +90,40 @@ function App() {
       <div className="mt-4">
         {todos.map((todo, i) => {
           return (
-            <div className="p-4 border" key={todo.id}>
+            <div
+              key={todo.id}
+              className={clsx('p-4 border', {
+                'bg-gray-200': todo.id === editTodo?.id,
+              })}
+            >
               {todo?.id === editTodo?.id ? (
-                <div className="flex items-center justify-between">
+                <form
+                  className="flex items-center justify-between"
+                  onSubmit={e => {
+                    e.preventDefault()
+                    handleUpdateTodo({
+                      ...editTodo,
+                      text: e.target.elements[0].value,
+                    })
+                    setEditTodo(null)
+                  }}
+                >
                   <input
+                    className="border w-5/6 px-4"
                     type="text"
-                    value={editTodo.text}
-                    onChange={e => {
-                      setEditTodo({...todo, text: e.target.value})
-                    }}
+                    defaultValue={editTodo.text}
                   />
                   <div className="flex">
                     <div>
-                      <button
-                        className="focus:outline-none"
-                        onClick={() => {
-                          handleUpdateTodo(editTodo)
-                          setEditTodo(null)
-                        }}
-                      >
+                      <button type="submit">
                         <img src={SaveIcon} className="h-4" alt="Save Todo" />
                       </button>
                     </div>
                     <div className="ml-4">
                       <button
                         className="focus:outline-none"
-                        onClick={() => {
+                        onClick={e => {
+                          e.preventDefault()
                           setEditTodo(null)
                         }}
                       >
@@ -126,7 +135,7 @@ function App() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </form>
               ) : (
                 <div className="flex items-center justify-between">
                   <div className="flex">
