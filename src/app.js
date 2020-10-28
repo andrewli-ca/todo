@@ -1,7 +1,7 @@
 import React from 'react'
 import {v4 as uuidv4} from 'uuid'
 import clsx from 'clsx'
-import AddIcon from 'assets/add-solid.svg'
+import {TodoForm} from 'components/todo-form'
 import CheckMarkIcon from 'assets/checkmark.svg'
 import EditIcon from 'assets/edit-pencil.svg'
 import DeleteIcon from 'assets/trash.svg'
@@ -30,21 +30,9 @@ function App() {
   console.log('App')
   const [todos, setTodos] = React.useState(data)
   const [editTodo, setEditTodo] = React.useState(null)
-  const input = React.useRef(null)
 
-  function handleSubmit(event) {
-    event.preventDefault()
-    const {newTodo} = event.target.elements
-
-    if (newTodo.value === '') {
-      return
-    }
-
-    setTodos([
-      ...todos,
-      {id: uuidv4(), text: newTodo.value, isCompleted: false},
-    ])
-    input.current.value = ''
+  function addNewTodo(todo) {
+    setTodos([...todos, {id: uuidv4(), text: todo, isCompleted: false}])
   }
 
   function handleDeleteTodo(todo) {
@@ -73,21 +61,7 @@ function App() {
         </h1>
       </div>
       <div className="mt-8">
-        <form onSubmit={handleSubmit} className="mb-6 md:mb-0 flex">
-          <div className="inline-block w-full">
-            <input
-              id="newTodo"
-              className="appearance-none w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-              placeholder="What needs to be done?"
-              ref={input}
-            />
-          </div>
-          <div className="inline-block my-auto ml-4">
-            <button type="submit" className="focus:outline-none">
-              <img src={AddIcon} className="h-6" alt="Add New Todo" />
-            </button>
-          </div>
-        </form>
+        <TodoForm saveTodo={addNewTodo} />
       </div>
       <div className="mt-4">
         {todos.map((todo, i) => {
