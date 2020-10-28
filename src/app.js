@@ -32,14 +32,17 @@ function App() {
   const [editTodo, setEditTodo] = React.useState(null)
   const input = React.useRef(null)
 
-  function handleAddTodo() {
-    if (input.current.value === '') {
+  function handleSubmit(event) {
+    event.preventDefault()
+    const {newTodo} = event.target.elements
+
+    if (newTodo.value === '') {
       return
     }
 
     setTodos([
       ...todos,
-      {id: uuidv4(), text: input.current.value, isCompleted: false},
+      {id: uuidv4(), text: newTodo.value, isCompleted: false},
     ])
     input.current.value = ''
   }
@@ -70,22 +73,21 @@ function App() {
         </h1>
       </div>
       <div className="mt-8">
-        <div className="w-full mb-6 md:mb-0 flex">
-          <input
-            className="appearance-none inline-block w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-            type="text"
-            placeholder="What needs to be done?"
-            ref={input}
-          />
+        <form onSubmit={handleSubmit} className="mb-6 md:mb-0 flex">
+          <div className="inline-block w-full">
+            <input
+              id="newTodo"
+              className="appearance-none w-full bg-gray-200 text-gray-700 border border-gray-700 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
+              placeholder="What needs to be done?"
+              ref={input}
+            />
+          </div>
           <div className="inline-block my-auto ml-4">
-            <button
-              className="focus:outline-none"
-              onClick={() => handleAddTodo()}
-            >
+            <button type="submit" className="focus:outline-none">
               <img src={AddIcon} className="h-6" alt="Add New Todo" />
             </button>
           </div>
-        </div>
+        </form>
       </div>
       <div className="mt-4">
         {todos.map((todo, i) => {
