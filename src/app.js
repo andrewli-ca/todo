@@ -26,6 +26,21 @@ const data = [
   },
 ]
 
+function ToggleCompleteButton({todo, toggleComplete}) {
+  return (
+    <button
+      className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
+      onClick={() => {
+        toggleComplete(todo)
+      }}
+    >
+      {todo.isCompleted ? (
+        <img src={CheckMarkIcon} className="h-3" alt="Mark as Completed" />
+      ) : null}
+    </button>
+  )
+}
+
 function App() {
   console.log('App')
   const [todos, setTodos] = React.useState(data)
@@ -43,6 +58,17 @@ function App() {
   function handleUpdateTodo(todo) {
     const newTodos = todos.map(t => {
       if (t.id === todo.id) {
+        return todo
+      }
+      return t
+    })
+    setTodos(newTodos)
+  }
+
+  function toggleComplete(todo) {
+    const newTodos = todos.map(t => {
+      if (t.id === todo.id) {
+        t.isCompleted = !todo.isCompleted
         return todo
       }
       return t
@@ -116,23 +142,10 @@ function App() {
                 <div className="flex items-center justify-between">
                   <div className="flex">
                     <div className="inline-block">
-                      <button
-                        className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
-                        onClick={() => {
-                          handleUpdateTodo({
-                            ...todo,
-                            isCompleted: !todo.isCompleted,
-                          })
-                        }}
-                      >
-                        {todo.isCompleted ? (
-                          <img
-                            src={CheckMarkIcon}
-                            className="h-3"
-                            alt="Mark as Completed"
-                          />
-                        ) : null}
-                      </button>
+                      <ToggleCompleteButton
+                        todo={todo}
+                        toggleComplete={toggleComplete}
+                      />
                     </div>
                     <div
                       className={clsx('inline-block ml-4 my-auto', {
