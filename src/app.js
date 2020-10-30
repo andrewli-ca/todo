@@ -22,7 +22,6 @@ const data = [
 ]
 
 function App() {
-  console.log('App')
   const [todos, setTodos] = React.useState(data)
 
   function addNewTodo(todo) {

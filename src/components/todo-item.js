@@ -6,21 +6,6 @@ import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
 
-function ToggleCompleteButton({todo, toggleComplete}) {
-  return (
-    <button
-      className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
-      onClick={() => {
-        toggleComplete(todo)
-      }}
-    >
-      {todo.isCompleted ? (
-        <img src={CheckMarkIcon} className="h-3" alt="Mark as Completed" />
-      ) : null}
-    </button>
-  )
-}
-
 function ActionButton({onClick, icon, ...rest}) {
   return (
     <button
@@ -30,7 +15,7 @@ function ActionButton({onClick, icon, ...rest}) {
       onClick={() => (onClick ? onClick() : () => {})}
       {...rest}
     >
-      <img src={icon} className="h-4" alt="lable" />
+      {icon ? <img src={icon} className="h-4" alt="lable" /> : null}
     </button>
   )
 }
@@ -76,14 +61,16 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
     <div className="flex items-center justify-between">
       <div className="flex">
         <div className="inline-block">
-          <ToggleCompleteButton
-            todo={todo}
-            toggleComplete={() =>
+          {/* Toggle complete todo button */}
+          <ActionButton
+            onClick={() =>
               handleUpdateTodo({
                 ...todo,
                 isCompleted: !todo.isCompleted,
               })
             }
+            icon={todo.isCompleted ? CheckMarkIcon : null}
+            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
           />
         </div>
         <div
