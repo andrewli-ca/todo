@@ -41,10 +41,120 @@ function ToggleCompleteButton({todo, toggleComplete}) {
   )
 }
 
+function DeleteTodoButton({todo, handleDeleteTodo}) {
+  return (
+    <button
+      className="focus:outline-none"
+      onClick={() => {
+        handleDeleteTodo(todo)
+      }}
+    >
+      <img src={DeleteIcon} className="h-4" alt="Delete Todo" />
+    </button>
+  )
+}
+
+function EditTodoButton({todo, setEditTodo}) {
+  return (
+    <button
+      className="focus:outline-none"
+      onClick={() => {
+        setEditTodo(todo)
+      }}
+    >
+      <img src={EditIcon} className="h-4" alt="Edit Todo" />
+    </button>
+  )
+}
+
+function TodoItem({todo, handleUpdateTodo, handleDeleteTodo}) {
+  const [editTodo, setEditTodo] = React.useState(null)
+
+  return (
+    <div
+      key={todo.id}
+      className={clsx('p-4 border', {
+        'bg-gray-200': todo.id === editTodo?.id,
+      })}
+    >
+      {todo?.id === editTodo?.id ? (
+        <form
+          className="flex items-center justify-between"
+          onSubmit={e => {
+            e.preventDefault()
+            handleUpdateTodo({
+              ...editTodo,
+              text: e.target.elements[0].value,
+            })
+            setEditTodo(null)
+          }}
+        >
+          <input
+            className="border w-5/6 px-4"
+            type="text"
+            defaultValue={editTodo.text}
+          />
+          <div className="flex">
+            <div>
+              <button type="submit">
+                <img src={SaveIcon} className="h-4" alt="Save Todo" />
+              </button>
+            </div>
+            <div className="ml-4">
+              <button
+                className="focus:outline-none"
+                onClick={e => {
+                  e.preventDefault()
+                  setEditTodo(null)
+                }}
+              >
+                <img src={CloseIcon} className="h-4" alt="Close Edit Mode" />
+              </button>
+            </div>
+          </div>
+        </form>
+      ) : (
+        <div className="flex items-center justify-between">
+          <div className="flex">
+            <div className="inline-block">
+              <ToggleCompleteButton
+                todo={todo}
+                toggleComplete={() =>
+                  handleUpdateTodo({
+                    ...todo,
+                    isCompleted: !todo.isCompleted,
+                  })
+                }
+              />
+            </div>
+            <div
+              className={clsx('inline-block ml-4 my-auto', {
+                'line-through': todo.isCompleted,
+              })}
+            >
+              {todo.text}
+            </div>
+          </div>
+          <div className="flex">
+            <div>
+              <EditTodoButton todo={todo} setEditTodo={setEditTodo} />
+            </div>
+            <div className="ml-4">
+              <DeleteTodoButton
+                todo={todo}
+                handleDeleteTodo={() => handleDeleteTodo(todo)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function App() {
   console.log('App')
   const [todos, setTodos] = React.useState(data)
-  const [editTodo, setEditTodo] = React.useState(null)
 
   function addNewTodo(todo) {
     setTodos([...todos, {id: uuidv4(), text: todo, isCompleted: false}])
@@ -55,23 +165,12 @@ function App() {
     setTodos(newTodos)
   }
 
-  function handleUpdateTodo(todo) {
-    const newTodos = todos.map(t => {
-      if (t.id === todo.id) {
-        return todo
+  function handleUpdateTodo(todoForUpdate) {
+    const newTodos = todos.map(todo => {
+      if (todo.id === todoForUpdate.id) {
+        return todoForUpdate
       }
-      return t
-    })
-    setTodos(newTodos)
-  }
-
-  function toggleComplete(todo) {
-    const newTodos = todos.map(t => {
-      if (t.id === todo.id) {
-        t.isCompleted = !todo.isCompleted
-        return todo
-      }
-      return t
+      return todo
     })
     setTodos(newTodos)
   }
@@ -92,98 +191,11 @@ function App() {
       <div className="mt-4">
         {todos.map((todo, i) => {
           return (
-            <div
-              key={todo.id}
-              className={clsx('p-4 border', {
-                'bg-gray-200': todo.id === editTodo?.id,
-              })}
-            >
-              {todo?.id === editTodo?.id ? (
-                <form
-                  className="flex items-center justify-between"
-                  onSubmit={e => {
-                    e.preventDefault()
-                    handleUpdateTodo({
-                      ...editTodo,
-                      text: e.target.elements[0].value,
-                    })
-                    setEditTodo(null)
-                  }}
-                >
-                  <input
-                    className="border w-5/6 px-4"
-                    type="text"
-                    defaultValue={editTodo.text}
-                  />
-                  <div className="flex">
-                    <div>
-                      <button type="submit">
-                        <img src={SaveIcon} className="h-4" alt="Save Todo" />
-                      </button>
-                    </div>
-                    <div className="ml-4">
-                      <button
-                        className="focus:outline-none"
-                        onClick={e => {
-                          e.preventDefault()
-                          setEditTodo(null)
-                        }}
-                      >
-                        <img
-                          src={CloseIcon}
-                          className="h-4"
-                          alt="Close Edit Mode"
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div className="flex">
-                    <div className="inline-block">
-                      <ToggleCompleteButton
-                        todo={todo}
-                        toggleComplete={toggleComplete}
-                      />
-                    </div>
-                    <div
-                      className={clsx('inline-block ml-4 my-auto', {
-                        'line-through': todo.isCompleted,
-                      })}
-                    >
-                      {todo.text}
-                    </div>
-                  </div>
-                  <div className="flex">
-                    <div>
-                      <button
-                        className="focus:outline-none"
-                        onClick={() => {
-                          setEditTodo(todo)
-                        }}
-                      >
-                        <img src={EditIcon} className="h-4" alt="Edit Todo" />
-                      </button>
-                    </div>
-                    <div className="ml-4">
-                      <button
-                        className="focus:outline-none"
-                        onClick={() => {
-                          handleDeleteTodo(todo)
-                        }}
-                      >
-                        <img
-                          src={DeleteIcon}
-                          className="h-4"
-                          alt="Delete Todo"
-                        />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <TodoItem
+              todo={todo}
+              handleUpdateTodo={handleUpdateTodo}
+              handleDeleteTodo={handleDeleteTodo}
+            />
           )
         })}
       </div>
