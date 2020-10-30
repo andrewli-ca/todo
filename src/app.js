@@ -24,7 +24,7 @@ const data = [
 function App() {
   const [todos, setTodos] = React.useState(data)
 
-  function addNewTodo(todo) {
+  function handleAddTodo(todo) {
     setTodos([...todos, {id: uuidv4(), text: todo, isCompleted: false}])
   }
 
@@ -54,7 +54,7 @@ function App() {
         </h1>
       </div>
       <div className="mt-8">
-        <TodoForm saveTodo={addNewTodo} />
+        <TodoForm handleAddTodo={handleAddTodo} />
       </div>
       <div className="mt-4">
         {todos.map(todo => {

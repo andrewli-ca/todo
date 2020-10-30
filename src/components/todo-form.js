@@ -1,7 +1,7 @@
 import React from 'react'
 import AddIcon from 'assets/add-solid.svg'
 
-function TodoForm({saveTodo}) {
+function TodoForm({handleAddTodo}) {
   const input = React.useRef(null)
 
   function handleSubmit(event) {
@@ -12,7 +12,7 @@ function TodoForm({saveTodo}) {
       return
     }
 
-    saveTodo(newTodo.value)
+    handleAddTodo(newTodo.value)
     input.current.value = ''
   }
 
