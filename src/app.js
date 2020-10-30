@@ -41,28 +41,16 @@ function ToggleCompleteButton({todo, toggleComplete}) {
   )
 }
 
-function DeleteTodoButton({todo, handleDeleteTodo}) {
+function ActionButton({onClick, icon, ...rest}) {
   return (
     <button
+      type="button"
       className="focus:outline-none"
-      onClick={() => {
-        handleDeleteTodo(todo)
-      }}
+      // if button type is submit, there is no onclick handler passed into props
+      onClick={() => (onClick ? onClick() : () => {})}
+      {...rest}
     >
-      <img src={DeleteIcon} className="h-4" alt="Delete Todo" />
-    </button>
-  )
-}
-
-function EditTodoButton({todo, setEditTodo}) {
-  return (
-    <button
-      className="focus:outline-none"
-      onClick={() => {
-        setEditTodo(todo)
-      }}
-    >
-      <img src={EditIcon} className="h-4" alt="Edit Todo" />
+      <img src={icon} className="h-4" alt="lable" />
     </button>
   )
 }
@@ -87,20 +75,16 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
       />
       <div className="flex">
         <div>
-          <button type="submit">
-            <img src={SaveIcon} className="h-4" alt="Save Todo" />
-          </button>
+          <ActionButton type="submit" icon={SaveIcon} />
         </div>
         <div className="ml-4">
-          <button
-            className="focus:outline-none"
+          {/* Exit out of edit mode */}
+          <ActionButton
             onClick={e => {
-              e.preventDefault()
               setEditTodo(null)
             }}
-          >
-            <img src={CloseIcon} className="h-4" alt="Close Edit Mode" />
-          </button>
+            icon={CloseIcon}
+          />
         </div>
       </div>
     </form>
@@ -132,12 +116,13 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
       </div>
       <div className="flex">
         <div>
-          <EditTodoButton todo={todo} setEditTodo={setEditTodo} />
+          {/* Set todo to be edited */}
+          <ActionButton onClick={() => setEditTodo(todo)} icon={EditIcon} />
         </div>
         <div className="ml-4">
-          <DeleteTodoButton
-            todo={todo}
-            handleDeleteTodo={() => handleDeleteTodo(todo)}
+          <ActionButton
+            onClick={() => handleDeleteTodo(todo)}
+            icon={DeleteIcon}
           />
         </div>
       </div>
@@ -155,12 +140,13 @@ function TodoItem({todo, handleUpdateTodo, handleDeleteTodo}) {
         'bg-gray-200': todo.id === editTodo?.id,
       })}
     >
+      {/* Show todo item in view mode or edit mode */}
       {todo?.id === editTodo?.id ? (
         <EditItem
           editTodo={editTodo}
           handleUpdateTodo={handleUpdateTodo}
           setEditTodo={setEditTodo}
-        />
+        ></EditItem>
       ) : (
         <ViewItem
           todo={todo}
@@ -182,18 +168,18 @@ function App() {
   }
 
   function handleDeleteTodo(todo) {
-    const newTodos = todos.filter(t => t.id !== todo.id)
-    setTodos(newTodos)
+    const todosAfterDelete = todos.filter(t => t.id !== todo.id)
+    setTodos(todosAfterDelete)
   }
 
   function handleUpdateTodo(todoForUpdate) {
-    const newTodos = todos.map(todo => {
+    const todosAfterUpdate = todos.map(todo => {
       if (todo.id === todoForUpdate.id) {
         return todoForUpdate
       }
       return todo
     })
-    setTodos(newTodos)
+    setTodos(todosAfterUpdate)
   }
 
   return (
@@ -210,9 +196,10 @@ function App() {
         <TodoForm saveTodo={addNewTodo} />
       </div>
       <div className="mt-4">
-        {todos.map((todo, i) => {
+        {todos.map(todo => {
           return (
             <TodoItem
+              key={todo.id}
               todo={todo}
               handleUpdateTodo={handleUpdateTodo}
               handleDeleteTodo={handleDeleteTodo}
