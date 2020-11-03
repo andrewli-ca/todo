@@ -1,4 +1,4 @@
-const apiURL = '/.netlify/functions/'
+const apiURL = '/.netlify/functions'
 
 async function client(
   endpoint,
