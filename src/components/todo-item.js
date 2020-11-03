@@ -28,7 +28,10 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
         e.preventDefault()
         handleUpdateTodo({
           ...editTodo,
-          text: e.target.elements[0].value,
+          data: {
+            ...editTodo.data,
+            text: e.target.elements[0].value,
+          },
         })
         setEditTodo(null)
       }}
@@ -36,7 +39,7 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
       <input
         className="border w-5/6 px-4"
         type="text"
-        defaultValue={editTodo.text}
+        defaultValue={editTodo.data.text}
       />
       <div className="flex">
         <div>
@@ -66,19 +69,22 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
             onClick={() =>
               handleUpdateTodo({
                 ...todo,
-                isCompleted: !todo.isCompleted,
+                data: {
+                  ...todo.data,
+                  isCompleted: !todo.data.isCompleted,
+                },
               })
             }
-            icon={todo.isCompleted ? CheckMarkIcon : null}
+            icon={todo.data.isCompleted ? CheckMarkIcon : null}
             className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
           />
         </div>
         <div
           className={clsx('inline-block ml-4 my-auto', {
-            'line-through': todo.isCompleted,
+            'line-through': todo.data.isCompleted,
           })}
         >
-          {todo.text}
+          {todo.data.text}
         </div>
       </div>
       <div className="flex">
@@ -99,16 +105,17 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
 
 function TodoItem({todo, handleUpdateTodo, handleDeleteTodo}) {
   const [editTodo, setEditTodo] = React.useState(null)
+  const {id} = todo.ref['@ref']
+  const {id: editTodoId} = editTodo?.ref['@ref'] || ''
 
   return (
     <div
-      key={todo.id}
       className={clsx('p-4 border', {
-        'bg-gray-200': todo.id === editTodo?.id,
+        'bg-gray-200': id === editTodoId,
       })}
     >
       {/* Show todo item in view mode or edit mode */}
-      {todo?.id === editTodo?.id ? (
+      {id === editTodoId ? (
         <EditItem
           editTodo={editTodo}
           handleUpdateTodo={handleUpdateTodo}
