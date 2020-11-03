@@ -1,46 +1,49 @@
 import React from 'react'
-import {v4 as uuidv4} from 'uuid'
 import {TodoForm} from 'components/todo-form'
 import {TodoItem} from 'components/todo-item'
-
-const data = [
-  {
-    id: uuidv4(),
-    text: 'test todo 1',
-    isCompleted: false,
-  },
-  {
-    id: uuidv4(),
-    text: 'another todo',
-    isCompleted: false,
-  },
-  {
-    id: uuidv4(),
-    text: 'and another one',
-    isCompleted: true,
-  },
-]
+import {useAsync} from 'hooks/use-async'
+import {client} from 'utils/api-client'
 
 function App() {
-  const [todos, setTodos] = React.useState(data)
+  const {data: todos, run, isLoading, setData} = useAsync()
 
-  function handleAddTodo(todo) {
-    setTodos([...todos, {id: uuidv4(), text: todo, isCompleted: false}])
+  React.useEffect(() => {
+    run(client(`read-todos`).then(data => data.todos))
+  }, [run])
+
+  function handleAddTodo(todoText) {
+    client(`create-todo`, {data: {text: todoText}}).then(data =>
+      setData([...todos, data]),
+    )
   }
 
   function handleDeleteTodo(todo) {
-    const todosAfterDelete = todos.filter(t => t.id !== todo.id)
-    setTodos(todosAfterDelete)
+    const {id} = todo.ref['@ref']
+    client(`delete-todo?id=${id}`, {method: 'DELETE'}).then(data => {
+      const todosAfterDelete = todos.filter(t => t.ref['@ref'].id !== id)
+      setData(todosAfterDelete)
+    })
   }
 
   function handleUpdateTodo(todoForUpdate) {
-    const todosAfterUpdate = todos.map(todo => {
-      if (todo.id === todoForUpdate.id) {
-        return todoForUpdate
-      }
-      return todo
+    const {id} = todoForUpdate.ref['@ref']
+
+    client(`update-todo?id=${id}`, {
+      data: {...todoForUpdate.data},
+      method: 'PUT',
+    }).then(data => {
+      const todosAfterUpdate = todos.map(todo => {
+        if (id === todo.ref['@ref'].id) {
+          return todoForUpdate
+        }
+        return todo
+      })
+      setData(todosAfterUpdate)
     })
-    setTodos(todosAfterUpdate)
+  }
+
+  if (isLoading) {
+    return <div>loading..</div>
   }
 
   return (
@@ -57,10 +60,10 @@ function App() {
         <TodoForm handleAddTodo={handleAddTodo} />
       </div>
       <div className="mt-4">
-        {todos.map(todo => {
+        {todos?.map(todo => {
           return (
             <TodoItem
-              key={todo.id}
+              key={todo.ref['@ref'].id}
               todo={todo}
               handleUpdateTodo={handleUpdateTodo}
               handleDeleteTodo={handleDeleteTodo}
