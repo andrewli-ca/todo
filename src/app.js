@@ -1,46 +1,10 @@
 import React from 'react'
 import {TodoForm} from 'components/todo-form'
 import {TodoItem} from 'components/todo-item'
-import {useAsync} from 'hooks/use-async'
-import {client} from 'utils/api-client'
+import {useTodos} from 'hooks/use-todos'
 
 function App() {
-  const {data: todos, run, isLoading, setData} = useAsync()
-
-  React.useEffect(() => {
-    run(client(`read-todos`).then(data => data.todos))
-  }, [run])
-
-  function handleAddTodo(todoText) {
-    client(`create-todo`, {data: {text: todoText}}).then(data =>
-      setData([...todos, data]),
-    )
-  }
-
-  function handleDeleteTodo(todo) {
-    const {id} = todo.ref['@ref']
-    client(`delete-todo?id=${id}`, {method: 'DELETE'}).then(data => {
-      const todosAfterDelete = todos.filter(t => t.ref['@ref'].id !== id)
-      setData(todosAfterDelete)
-    })
-  }
-
-  function handleUpdateTodo(todoForUpdate) {
-    const {id} = todoForUpdate.ref['@ref']
-
-    client(`update-todo?id=${id}`, {
-      data: {...todoForUpdate.data},
-      method: 'PUT',
-    }).then(data => {
-      const todosAfterUpdate = todos.map(todo => {
-        if (id === todo.ref['@ref'].id) {
-          return todoForUpdate
-        }
-        return todo
-      })
-      setData(todosAfterUpdate)
-    })
-  }
+  const {todos, add, update, remove, isLoading} = useTodos()
 
   if (isLoading) {
     return <div>loading..</div>
@@ -57,7 +21,7 @@ function App() {
         </h1>
       </div>
       <div className="mt-8">
-        <TodoForm handleAddTodo={handleAddTodo} />
+        <TodoForm handleAddTodo={add} />
       </div>
       <div className="mt-4">
         {todos?.map(todo => {
@@ -65,8 +29,8 @@ function App() {
             <TodoItem
               key={todo.ref['@ref'].id}
               todo={todo}
-              handleUpdateTodo={handleUpdateTodo}
-              handleDeleteTodo={handleDeleteTodo}
+              handleUpdateTodo={update}
+              handleDeleteTodo={remove}
             />
           )
         })}
