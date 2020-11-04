@@ -3,7 +3,15 @@ import {useAsync} from 'hooks/use-async'
 import {client} from 'utils/api-client'
 
 function useTodos() {
-  const {data: todos, run, isLoading, setData} = useAsync()
+  const {
+    data: todos,
+    error,
+    run,
+    isLoading,
+    isError,
+    setData,
+    setError,
+  } = useAsync()
 
   React.useEffect(() => {
     run(client(`read-todos`).then(data => data.todos))
@@ -16,14 +24,14 @@ function useTodos() {
   }
 
   function remove(todo) {
-    client(`delete-todo?id=${todo.ref['@ref'].id}`, {method: 'DELETE'}).then(
-      data => {
+    client(`delete-todo?id=${todo.ref['@ref'].id}`, {method: 'DELETE'})
+      .then(data => {
         const todosAfterDelete = todos.filter(
           t => t.ref['@ref'].id !== data.ref['@ref'].id,
         )
         setData(todosAfterDelete)
-      },
-    )
+      })
+      .catch(e => setError(e))
   }
 
   function update(todoForUpdate) {
@@ -41,7 +49,7 @@ function useTodos() {
     })
   }
 
-  return {todos, isLoading, add, update, remove}
+  return {todos, error, add, update, remove, isLoading, isError}
 }
 
 export {useTodos}

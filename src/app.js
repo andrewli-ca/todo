@@ -1,13 +1,26 @@
 import React from 'react'
+import {ErrorBoundary} from 'react-error-boundary'
 import {TodoForm} from 'components/todo-form'
 import {TodoItem} from 'components/todo-item'
 import {useTodos} from 'hooks/use-todos'
 
+function ErrorFallback({error}) {
+  return (
+    <div>
+      There was an error: <pre>{error.message}</pre>
+    </div>
+  )
+}
+
 function App() {
-  const {todos, add, update, remove, isLoading} = useTodos()
+  const {todos, error, add, update, remove, isLoading, isError} = useTodos()
 
   if (isLoading) {
     return <div>loading..</div>
+  }
+
+  if (isError) {
+    throw error
   }
 
   return (
@@ -23,18 +36,20 @@ function App() {
       <div className="mt-8">
         <TodoForm handleAddTodo={add} />
       </div>
-      <div className="mt-4">
-        {todos?.map(todo => {
-          return (
-            <TodoItem
-              key={todo.ref['@ref'].id}
-              todo={todo}
-              handleUpdateTodo={update}
-              handleDeleteTodo={remove}
-            />
-          )
-        })}
-      </div>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <div className="mt-4">
+          {todos?.map(todo => {
+            return (
+              <TodoItem
+                key={todo.ref['@ref'].id}
+                todo={todo}
+                handleUpdateTodo={update}
+                handleDeleteTodo={remove}
+              />
+            )
+          })}
+        </div>
+      </ErrorBoundary>
     </div>
   )
 }

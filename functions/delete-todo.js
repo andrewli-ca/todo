@@ -12,9 +12,14 @@ exports.handler = async event => {
   const document = await client.query(query)
 
   return {
-    statusCode: 200,
-    body: JSON.stringify({
-      ...document,
-    }),
+    statusCode: 400,
+    body: JSON.stringify('uhoh'),
   }
+
+  // return {
+  //   statusCode: 200,
+  //   body: JSON.stringify({
+  //     ...document,
+  //   }),
+  // }
 }
