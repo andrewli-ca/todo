@@ -31,46 +31,32 @@ function EditItem({
   updating,
   isLoading,
 }) {
-  const [text, setText] = React.useState(editTodo.data.text)
-  console.log(text)
   return (
-    <div
+    <form
       className="flex items-center justify-between"
-      // onSubmit={e => {
-      //   e.preventDefault()
-      //   handleUpdateTodo({
-      //     ...editTodo,
-      //     data: {
-      //       ...editTodo.data,
-      //       text: e.target.elements[0].value,
-      //     },
-      //   })
-      //   setEditTodo(null)
-      // }}
+      onSubmit={e => {
+        e.preventDefault()
+        handleUpdateTodo(
+          {
+            ...editTodo,
+            data: {
+              ...editTodo.data,
+              text: e.target.elements[0].value,
+            },
+          },
+          () => setEditTodo(null),
+        )
+      }}
     >
       <input
         className="border w-5/6 px-4"
         type="text"
         defaultValue={editTodo.data.text}
-        onChange={e => setText(e.target.value)}
       />
       <div className="flex">
         <div>
           <ActionButton
-            // type="submit"
-            onClick={e => {
-              handleUpdateTodo(
-                {
-                  ...editTodo,
-                  data: {
-                    ...editTodo.data,
-                    text,
-                  },
-                },
-                () => setEditTodo(null),
-              )
-              // setEditTodo(null)
-            }}
+            type="submit"
             icon={SaveIcon}
             updating={
               editTodo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
@@ -92,7 +78,7 @@ function EditItem({
           />
         </div>
       </div>
-    </div>
+    </form>
   )
 }
 
