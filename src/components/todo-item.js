@@ -6,7 +6,7 @@ import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
 
-function ActionButton({onClick, icon, ...rest}) {
+function ActionButton({onClick, icon, updating, ...rest}) {
   return (
     <button
       type="button"
@@ -15,7 +15,11 @@ function ActionButton({onClick, icon, ...rest}) {
       onClick={() => (onClick ? onClick() : () => {})}
       {...rest}
     >
-      {icon ? <img src={icon} className="h-4" alt="lable" /> : null}
+      {updating ? (
+        <div>loading..</div>
+      ) : icon ? (
+        <img src={icon} className="h-4" alt="lable" />
+      ) : null}
     </button>
   )
 }
@@ -59,7 +63,15 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
   )
 }
 
-function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
+function ViewItem({
+  todo,
+  handleUpdateTodo,
+  handleDeleteTodo,
+  setEditTodo,
+  updating,
+}) {
+  const [action, setAction] = React.useState('')
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex">
@@ -90,12 +102,23 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
       <div className="flex">
         <div>
           {/* Set todo to be edited */}
-          <ActionButton onClick={() => setEditTodo(todo)} icon={EditIcon} />
+          <ActionButton
+            onClick={() => {
+              setAction('edit')
+              setEditTodo(todo)
+            }}
+            icon={EditIcon}
+            updating={action === 'edit'}
+          />
         </div>
         <div className="ml-4">
           <ActionButton
-            onClick={() => handleDeleteTodo(todo)}
+            onClick={() => {
+              setAction('delete')
+              handleDeleteTodo(todo)
+            }}
             icon={DeleteIcon}
+            updating={action === 'delete'}
           />
         </div>
       </div>
@@ -103,7 +126,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
   )
 }
 
-function TodoItem({todo, handleUpdateTodo, handleDeleteTodo}) {
+function TodoItem({todo, handleUpdateTodo, handleDeleteTodo, updating}) {
   const [editTodo, setEditTodo] = React.useState(null)
   const {id} = todo.ref['@ref']
   const {id: editTodoId} = editTodo?.ref['@ref'] || ''
@@ -127,6 +150,7 @@ function TodoItem({todo, handleUpdateTodo, handleDeleteTodo}) {
           handleUpdateTodo={handleUpdateTodo}
           handleDeleteTodo={handleDeleteTodo}
           setEditTodo={setEditTodo}
+          updating={updating}
         />
       )}
     </div>
