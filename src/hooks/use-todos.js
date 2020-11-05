@@ -17,21 +17,21 @@ function useTodos() {
   }
 
   function remove(todo) {
-    setUpdating({status: 'pending', todo})
+    setUpdating({status: 'pending', action: 'delete', todo})
     client(`delete-todo?id=${todo.ref['@ref'].id}`, {method: 'DELETE'}).then(
       data => {
         const todosAfterDelete = todos.filter(
           t => t.ref['@ref'].id !== data.ref['@ref'].id,
         )
         setData(todosAfterDelete)
-        setUpdating({status: 'resolved'})
+        setUpdating({status: 'resolved', action: 'delete'})
       },
     )
   }
 
   function update(todoForUpdate, callback) {
     console.log(todoForUpdate)
-    setUpdating({status: 'pending', todo: todoForUpdate})
+    setUpdating({status: 'pending', action: 'update', todo: todoForUpdate})
 
     client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
       data: {...todoForUpdate.data},
@@ -44,12 +44,19 @@ function useTodos() {
         return todo
       })
       setData(todosAfterUpdate)
-      setUpdating({status: 'resolved'})
+      setUpdating({status: 'resolved', action: 'update'})
       callback()
     })
   }
 
-  return {todos, isLoading, add, update, remove, updating}
+  return {
+    todos,
+    isLoading: isLoading || updating.todo,
+    add,
+    update,
+    remove,
+    updating,
+  }
 }
 
 export {useTodos}

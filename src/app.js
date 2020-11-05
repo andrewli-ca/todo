@@ -7,7 +7,7 @@ function App() {
   console.log('App')
   const {todos, add, update, remove, isLoading, updating} = useTodos()
 
-  if (isLoading) {
+  if (!todos && isLoading) {
     return <div>loading..</div>
   }
 
@@ -33,6 +33,7 @@ function App() {
               handleUpdateTodo={update}
               handleDeleteTodo={remove}
               updating={updating}
+              isLoading={isLoading}
             />
           )
         })}

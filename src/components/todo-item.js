@@ -6,7 +6,7 @@ import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
 
-function ActionButton({onClick, icon, updating, ...rest}) {
+function ActionButton({onClick, icon, isLoading, ...rest}) {
   return (
     <button
       type="button"
@@ -15,7 +15,7 @@ function ActionButton({onClick, icon, updating, ...rest}) {
       onClick={() => (onClick ? onClick() : () => {})}
       {...rest}
     >
-      {updating ? (
+      {isLoading ? (
         <div>loading..</div>
       ) : icon ? (
         <img src={icon} className="h-4" alt="lable" />
@@ -24,7 +24,13 @@ function ActionButton({onClick, icon, updating, ...rest}) {
   )
 }
 
-function EditItem({editTodo, handleUpdateTodo, setEditTodo, updating}) {
+function EditItem({
+  editTodo,
+  handleUpdateTodo,
+  setEditTodo,
+  updating,
+  isLoading,
+}) {
   const [text, setText] = React.useState(editTodo.data.text)
   console.log(text)
   return (
@@ -69,6 +75,11 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo, updating}) {
             updating={
               editTodo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
             }
+            isLoading={
+              isLoading &&
+              updating.action === 'update' &&
+              editTodo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
+            }
           />
         </div>
         <div className="ml-4">
@@ -91,6 +102,7 @@ function ViewItem({
   handleDeleteTodo,
   setEditTodo,
   updating,
+  isLoading,
 }) {
   return (
     <div className="flex items-center justify-between">
@@ -135,6 +147,11 @@ function ViewItem({
               handleDeleteTodo(todo)
             }}
             icon={DeleteIcon}
+            isLoading={
+              isLoading &&
+              updating.action === 'delete' &&
+              todo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
+            }
             updating={todo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id}
           />
         </div>
@@ -143,7 +160,13 @@ function ViewItem({
   )
 }
 
-function TodoItem({todo, handleUpdateTodo, handleDeleteTodo, updating}) {
+function TodoItem({
+  todo,
+  handleUpdateTodo,
+  handleDeleteTodo,
+  updating,
+  isLoading,
+}) {
   const [editTodo, setEditTodo] = React.useState(null)
   const {id} = todo.ref['@ref']
   const {id: editTodoId} = editTodo?.ref['@ref'] || ''
@@ -161,6 +184,7 @@ function TodoItem({todo, handleUpdateTodo, handleDeleteTodo, updating}) {
           handleUpdateTodo={handleUpdateTodo}
           setEditTodo={setEditTodo}
           updating={updating}
+          isLoading={isLoading}
         ></EditItem>
       ) : (
         <ViewItem
@@ -169,6 +193,7 @@ function TodoItem({todo, handleUpdateTodo, handleDeleteTodo, updating}) {
           handleDeleteTodo={handleDeleteTodo}
           setEditTodo={setEditTodo}
           updating={updating}
+          isLoading={isLoading}
         />
       )}
     </div>
