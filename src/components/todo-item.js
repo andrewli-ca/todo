@@ -68,10 +68,9 @@ function ViewItem({
   handleUpdateTodo,
   handleDeleteTodo,
   setEditTodo,
-  updating,
+  action,
+  setAction,
 }) {
-  const [action, setAction] = React.useState('')
-
   return (
     <div className="flex items-center justify-between">
       <div className="flex">
@@ -104,11 +103,9 @@ function ViewItem({
           {/* Set todo to be edited */}
           <ActionButton
             onClick={() => {
-              setAction('edit')
               setEditTodo(todo)
             }}
             icon={EditIcon}
-            updating={action === 'edit'}
           />
         </div>
         <div className="ml-4">
