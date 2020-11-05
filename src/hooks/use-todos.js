@@ -29,8 +29,9 @@ function useTodos() {
     )
   }
 
-  function update(todoForUpdate) {
-    setUpdating({status: 'pending', todoForUpdate})
+  function update(todoForUpdate, callback) {
+    console.log(todoForUpdate)
+    setUpdating({status: 'pending', todo: todoForUpdate})
 
     client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
       data: {...todoForUpdate.data},
@@ -44,6 +45,7 @@ function useTodos() {
       })
       setData(todosAfterUpdate)
       setUpdating({status: 'resolved'})
+      callback()
     })
   }
 

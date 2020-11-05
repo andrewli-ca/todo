@@ -4,6 +4,7 @@ import {TodoItem} from 'components/todo-item'
 import {useTodos} from 'hooks/use-todos'
 
 function App() {
+  console.log('App')
   const {todos, add, update, remove, isLoading, updating} = useTodos()
 
   if (isLoading) {

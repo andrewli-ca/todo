@@ -24,30 +24,52 @@ function ActionButton({onClick, icon, updating, ...rest}) {
   )
 }
 
-function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
+function EditItem({editTodo, handleUpdateTodo, setEditTodo, updating}) {
+  const [text, setText] = React.useState(editTodo.data.text)
+  console.log(text)
   return (
-    <form
+    <div
       className="flex items-center justify-between"
-      onSubmit={e => {
-        e.preventDefault()
-        handleUpdateTodo({
-          ...editTodo,
-          data: {
-            ...editTodo.data,
-            text: e.target.elements[0].value,
-          },
-        })
-        setEditTodo(null)
-      }}
+      // onSubmit={e => {
+      //   e.preventDefault()
+      //   handleUpdateTodo({
+      //     ...editTodo,
+      //     data: {
+      //       ...editTodo.data,
+      //       text: e.target.elements[0].value,
+      //     },
+      //   })
+      //   setEditTodo(null)
+      // }}
     >
       <input
         className="border w-5/6 px-4"
         type="text"
         defaultValue={editTodo.data.text}
+        onChange={e => setText(e.target.value)}
       />
       <div className="flex">
         <div>
-          <ActionButton type="submit" icon={SaveIcon} />
+          <ActionButton
+            // type="submit"
+            onClick={e => {
+              handleUpdateTodo(
+                {
+                  ...editTodo,
+                  data: {
+                    ...editTodo.data,
+                    text,
+                  },
+                },
+                () => setEditTodo(null),
+              )
+              // setEditTodo(null)
+            }}
+            icon={SaveIcon}
+            updating={
+              editTodo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
+            }
+          />
         </div>
         <div className="ml-4">
           {/* Exit out of edit mode */}
@@ -59,7 +81,7 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
           />
         </div>
       </div>
-    </form>
+    </div>
   )
 }
 
@@ -68,8 +90,7 @@ function ViewItem({
   handleUpdateTodo,
   handleDeleteTodo,
   setEditTodo,
-  action,
-  setAction,
+  updating,
 }) {
   return (
     <div className="flex items-center justify-between">
@@ -111,11 +132,10 @@ function ViewItem({
         <div className="ml-4">
           <ActionButton
             onClick={() => {
-              setAction('delete')
               handleDeleteTodo(todo)
             }}
             icon={DeleteIcon}
-            updating={action === 'delete'}
+            updating={todo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id}
           />
         </div>
       </div>
@@ -140,6 +160,7 @@ function TodoItem({todo, handleUpdateTodo, handleDeleteTodo, updating}) {
           editTodo={editTodo}
           handleUpdateTodo={handleUpdateTodo}
           setEditTodo={setEditTodo}
+          updating={updating}
         ></EditItem>
       ) : (
         <ViewItem
