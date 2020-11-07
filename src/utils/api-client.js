@@ -4,7 +4,6 @@ async function client(
   endpoint,
   {data, token, headers: customHeaders, ...customConfig} = {},
 ) {
-  console.log('client')
   const config = {
     method: data ? 'POST' : 'GET',
     body: data ? JSON.stringify(data) : undefined,
