@@ -3,36 +3,33 @@ import {useAsync} from 'hooks/use-async'
 import {client} from 'utils/api-client'
 
 function useTodos() {
-  const [updating, setUpdating] = React.useState({status: 'idle'})
   const {data: todos, run, isLoading, setData} = useAsync()
 
+  const refetch = React.useCallback(
+    () =>
+      run(
+        client(`read-todos`).then(data => {
+          return data.todos
+        }),
+      ),
+    [run],
+  )
+
   React.useEffect(() => {
-    run(client(`read-todos`).then(data => data.todos))
-  }, [run])
+    refetch()
+  }, [refetch])
 
   function add(todoText) {
-    client(`create-todo`, {data: {text: todoText}}).then(data =>
-      setData([...todos, data]),
-    )
+    return client(`create-todo`, {data: {text: todoText}}).then(refetch)
   }
 
   function remove(todo) {
-    setUpdating({status: 'pending', action: 'delete', todo})
-    client(`delete-todo?id=${todo.ref['@ref'].id}`, {method: 'DELETE'}).then(
-      data => {
-        const todosAfterDelete = todos.filter(
-          t => t.ref['@ref'].id !== data.ref['@ref'].id,
-        )
-        setData(todosAfterDelete)
-        setUpdating({status: 'resolved', action: 'delete'})
-      },
-    )
+    return client(`delete-todo?id=${todo.ref['@ref'].id}`, {
+      method: 'DELETE',
+    }).then(refetch)
   }
 
-  function update(todoForUpdate, callback) {
-    console.log(todoForUpdate)
-    setUpdating({status: 'pending', action: 'update', todo: todoForUpdate})
-
+  function update(todoForUpdate) {
     client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
       data: {...todoForUpdate.data},
       method: 'PUT',
@@ -44,18 +41,15 @@ function useTodos() {
         return todo
       })
       setData(todosAfterUpdate)
-      setUpdating({status: 'resolved', action: 'update'})
-      callback()
     })
   }
 
   return {
     todos,
-    isLoading: isLoading || updating.todo,
+    isLoading,
     add,
     update,
     remove,
-    updating,
   }
 }
 

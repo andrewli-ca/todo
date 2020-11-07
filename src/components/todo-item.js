@@ -1,18 +1,42 @@
 import React from 'react'
 import clsx from 'clsx'
+import {useAsync} from 'hooks/use-async'
 import CheckMarkIcon from 'assets/checkmark.svg'
 import EditIcon from 'assets/edit-pencil.svg'
 import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
 
-function ActionButton({onClick, icon, isLoading, ...rest}) {
+function IconButton({onClick, icon, ...rest}) {
   return (
     <button
       type="button"
       className="focus:outline-none"
       // if button type is submit, there is no onclick handler passed into props
       onClick={() => (onClick ? onClick() : () => {})}
+      {...rest}
+    >
+      {icon ? <img src={icon} className="h-4" alt="lable" /> : null}
+    </button>
+  )
+}
+
+function ActionButton({onClick, icon, ...rest}) {
+  const {isLoading, isError, run, reset} = useAsync()
+
+  function handleClick() {
+    if (isError) {
+      reset()
+    } else {
+      run(onClick())
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      className="focus:outline-none"
+      onClick={handleClick}
       {...rest}
     >
       {isLoading ? (
@@ -31,24 +55,26 @@ function EditItem({
   updating,
   isLoading,
 }) {
+  const inputRef = React.useRef(null)
   return (
-    <form
+    <div
       className="flex items-center justify-between"
-      onSubmit={e => {
-        e.preventDefault()
-        handleUpdateTodo(
-          {
-            ...editTodo,
-            data: {
-              ...editTodo.data,
-              text: e.target.elements[0].value,
-            },
-          },
-          () => setEditTodo(null),
-        )
-      }}
+      // onSubmit={e => {
+      //   e.preventDefault()
+      //   handleUpdateTodo(
+      //     {
+      //       ...editTodo,
+      //       data: {
+      //         ...editTodo.data,
+      //         text: e.target.elements[0].value,
+      //       },
+      //     },
+      //     () => setEditTodo(null),
+      //   )
+      // }}
     >
       <input
+        ref={inputRef}
         className="border w-5/6 px-4"
         type="text"
         defaultValue={editTodo.data.text}
@@ -58,19 +84,20 @@ function EditItem({
           <ActionButton
             type="submit"
             icon={SaveIcon}
-            updating={
-              editTodo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
-            }
-            isLoading={
-              isLoading &&
-              updating.action === 'update' &&
-              editTodo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
+            onClick={() =>
+              handleUpdateTodo({
+                ...editTodo,
+                data: {
+                  ...editTodo.data,
+                  text: inputRef.current.value,
+                },
+              })
             }
           />
         </div>
         <div className="ml-4">
           {/* Exit out of edit mode */}
-          <ActionButton
+          <IconButton
             onClick={e => {
               setEditTodo(null)
             }}
@@ -78,18 +105,11 @@ function EditItem({
           />
         </div>
       </div>
-    </form>
+    </div>
   )
 }
 
-function ViewItem({
-  todo,
-  handleUpdateTodo,
-  handleDeleteTodo,
-  setEditTodo,
-  updating,
-  isLoading,
-}) {
+function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex">
@@ -120,7 +140,7 @@ function ViewItem({
       <div className="flex">
         <div>
           {/* Set todo to be edited */}
-          <ActionButton
+          <IconButton
             onClick={() => {
               setEditTodo(todo)
             }}
@@ -129,16 +149,8 @@ function ViewItem({
         </div>
         <div className="ml-4">
           <ActionButton
-            onClick={() => {
-              handleDeleteTodo(todo)
-            }}
+            onClick={() => handleDeleteTodo(todo)}
             icon={DeleteIcon}
-            isLoading={
-              isLoading &&
-              updating.action === 'delete' &&
-              todo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id
-            }
-            updating={todo?.ref['@ref'].id === updating?.todo?.ref['@ref'].id}
           />
         </div>
       </div>
@@ -146,13 +158,7 @@ function ViewItem({
   )
 }
 
-function TodoItem({
-  todo,
-  handleUpdateTodo,
-  handleDeleteTodo,
-  updating,
-  isLoading,
-}) {
+function TodoItem({todo, handleUpdateTodo, handleDeleteTodo}) {
   const [editTodo, setEditTodo] = React.useState(null)
   const {id} = todo.ref['@ref']
   const {id: editTodoId} = editTodo?.ref['@ref'] || ''
@@ -169,8 +175,6 @@ function TodoItem({
           editTodo={editTodo}
           handleUpdateTodo={handleUpdateTodo}
           setEditTodo={setEditTodo}
-          updating={updating}
-          isLoading={isLoading}
         ></EditItem>
       ) : (
         <ViewItem
@@ -178,8 +182,6 @@ function TodoItem({
           handleUpdateTodo={handleUpdateTodo}
           handleDeleteTodo={handleDeleteTodo}
           setEditTodo={setEditTodo}
-          updating={updating}
-          isLoading={isLoading}
         />
       )}
     </div>

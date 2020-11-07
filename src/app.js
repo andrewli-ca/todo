@@ -4,8 +4,7 @@ import {TodoItem} from 'components/todo-item'
 import {useTodos} from 'hooks/use-todos'
 
 function App() {
-  console.log('App')
-  const {todos, add, update, remove, isLoading, updating} = useTodos()
+  const {todos, add, update, remove, isLoading} = useTodos()
 
   if (!todos && isLoading) {
     return <div>loading..</div>
@@ -32,8 +31,6 @@ function App() {
               todo={todo}
               handleUpdateTodo={update}
               handleDeleteTodo={remove}
-              updating={updating}
-              isLoading={isLoading}
             />
           )
         })}
