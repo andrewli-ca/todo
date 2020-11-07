@@ -12,21 +12,23 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
   const {isLoading, run} = useAsync()
   const inputRef = React.useRef(null)
 
+  function handeleSubmit(event) {
+    event.preventDefault()
+    run(
+      handleUpdateTodo({
+        ...editTodo,
+        data: {
+          ...editTodo.data,
+          text: event.target.elements[0].value,
+        },
+      }),
+    ).then(() => setEditTodo(null))
+  }
+
   return (
     <form
       className="flex items-center justify-between"
-      onSubmit={e => {
-        e.preventDefault()
-        run(
-          handleUpdateTodo({
-            ...editTodo,
-            data: {
-              ...editTodo.data,
-              text: e.target.elements[0].value,
-            },
-          }),
-        ).then(() => setEditTodo(null))
-      }}
+      onSubmit={handeleSubmit}
     >
       <input
         ref={inputRef}

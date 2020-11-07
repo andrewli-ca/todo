@@ -29,9 +29,9 @@ function useTodos() {
     }).then(refetch)
   }
 
-  function update(todoForUpdate) {
-    return client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
-      data: {...todoForUpdate.data},
+  function update(todo) {
+    return client(`update-todo?id=${todo.ref['@ref'].id}`, {
+      data: {...todo.data},
       method: 'PUT',
     }).then(refetch)
   }
