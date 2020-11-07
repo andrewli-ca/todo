@@ -30,18 +30,10 @@ function useTodos() {
   }
 
   function update(todoForUpdate) {
-    client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
+    return client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
       data: {...todoForUpdate.data},
       method: 'PUT',
-    }).then(data => {
-      const todosAfterUpdate = todos.map(todo => {
-        if (todo.ref['@ref'].id === data.ref['@ref'].id) {
-          return todoForUpdate
-        }
-        return todo
-      })
-      setData(todosAfterUpdate)
-    })
+    }).then(refetch)
   }
 
   return {

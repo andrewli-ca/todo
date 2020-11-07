@@ -6,6 +6,7 @@ import EditIcon from 'assets/edit-pencil.svg'
 import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
+import Spinner from 'assets/spinner.svg'
 
 function IconButton({onClick, icon, ...rest}) {
   return (
@@ -48,30 +49,25 @@ function ActionButton({onClick, icon, ...rest}) {
   )
 }
 
-function EditItem({
-  editTodo,
-  handleUpdateTodo,
-  setEditTodo,
-  updating,
-  isLoading,
-}) {
+function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
+  const {isLoading, isError, run, reset} = useAsync()
   const inputRef = React.useRef(null)
+
   return (
-    <div
+    <form
       className="flex items-center justify-between"
-      // onSubmit={e => {
-      //   e.preventDefault()
-      //   handleUpdateTodo(
-      //     {
-      //       ...editTodo,
-      //       data: {
-      //         ...editTodo.data,
-      //         text: e.target.elements[0].value,
-      //       },
-      //     },
-      //     () => setEditTodo(null),
-      //   )
-      // }}
+      onSubmit={e => {
+        e.preventDefault()
+        run(
+          handleUpdateTodo({
+            ...editTodo,
+            data: {
+              ...editTodo.data,
+              text: e.target.elements[0].value,
+            },
+          }),
+        ).then(() => setEditTodo(null))
+      }}
     >
       <input
         ref={inputRef}
@@ -81,19 +77,7 @@ function EditItem({
       />
       <div className="flex">
         <div>
-          <ActionButton
-            type="submit"
-            icon={SaveIcon}
-            onClick={() =>
-              handleUpdateTodo({
-                ...editTodo,
-                data: {
-                  ...editTodo.data,
-                  text: inputRef.current.value,
-                },
-              })
-            }
-          />
+          <IconButton type="submit" icon={isLoading ? Spinner : SaveIcon} />
         </div>
         <div className="ml-4">
           {/* Exit out of edit mode */}
@@ -105,7 +89,7 @@ function EditItem({
           />
         </div>
       </div>
-    </div>
+    </form>
   )
 }
 
