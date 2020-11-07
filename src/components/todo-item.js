@@ -1,56 +1,15 @@
 import React from 'react'
 import clsx from 'clsx'
 import {useAsync} from 'hooks/use-async'
+import {IconButton, AsyncButton} from 'components/lib'
 import CheckMarkIcon from 'assets/checkmark.svg'
 import EditIcon from 'assets/edit-pencil.svg'
 import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
-import Spinner from 'assets/spinner.svg'
-
-function IconButton({onClick, icon, ...rest}) {
-  return (
-    <button
-      type="button"
-      className="focus:outline-none"
-      // if button type is submit, there is no onclick handler passed into props
-      onClick={() => (onClick ? onClick() : () => {})}
-      {...rest}
-    >
-      {icon ? <img src={icon} className="h-4" alt="lable" /> : null}
-    </button>
-  )
-}
-
-function ActionButton({onClick, icon, ...rest}) {
-  const {isLoading, isError, run, reset} = useAsync()
-
-  function handleClick() {
-    if (isError) {
-      reset()
-    } else {
-      run(onClick())
-    }
-  }
-
-  return (
-    <button
-      type="button"
-      className="focus:outline-none"
-      onClick={handleClick}
-      {...rest}
-    >
-      {isLoading ? (
-        <div>loading..</div>
-      ) : icon ? (
-        <img src={icon} className="h-4" alt="lable" />
-      ) : null}
-    </button>
-  )
-}
 
 function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
-  const {isLoading, isError, run, reset} = useAsync()
+  const {isLoading, run} = useAsync()
   const inputRef = React.useRef(null)
 
   return (
@@ -77,7 +36,11 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
       />
       <div className="flex">
         <div>
-          <IconButton type="submit" icon={isLoading ? Spinner : SaveIcon} />
+          <AsyncButton
+            type="submit"
+            icon={SaveIcon}
+            isSubmitLoading={isLoading}
+          />
         </div>
         <div className="ml-4">
           {/* Exit out of edit mode */}
@@ -99,7 +62,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
       <div className="flex">
         <div className="inline-block">
           {/* Toggle complete todo button */}
-          <ActionButton
+          <AsyncButton
             onClick={() =>
               handleUpdateTodo({
                 ...todo,
@@ -110,7 +73,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
               })
             }
             icon={todo.data.isCompleted ? CheckMarkIcon : null}
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
+            className="bg-transparent text-blue-700 font-semibold hover:text-white border border-blue-500 focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
           />
         </div>
         <div
@@ -132,7 +95,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
           />
         </div>
         <div className="ml-4">
-          <ActionButton
+          <AsyncButton
             onClick={() => handleDeleteTodo(todo)}
             icon={DeleteIcon}
           />

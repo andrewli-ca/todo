@@ -3,7 +3,7 @@ import {useAsync} from 'hooks/use-async'
 import {client} from 'utils/api-client'
 
 function useTodos() {
-  const {data: todos, run, isLoading, setData} = useAsync()
+  const {data: todos, run, isLoading} = useAsync()
 
   const refetch = React.useCallback(
     () =>
