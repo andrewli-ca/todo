@@ -1,53 +1,52 @@
 import React from 'react'
 import clsx from 'clsx'
+import {useAsync} from 'hooks/use-async'
+import {IconButton, AsyncButton} from 'components/lib'
 import CheckMarkIcon from 'assets/checkmark.svg'
 import EditIcon from 'assets/edit-pencil.svg'
 import DeleteIcon from 'assets/trash.svg'
 import SaveIcon from 'assets/save-disk.svg'
 import CloseIcon from 'assets/close.svg'
 
-function ActionButton({onClick, icon, ...rest}) {
-  return (
-    <button
-      type="button"
-      className="focus:outline-none"
-      // if button type is submit, there is no onclick handler passed into props
-      onClick={() => (onClick ? onClick() : () => {})}
-      {...rest}
-    >
-      {icon ? <img src={icon} className="h-4" alt="lable" /> : null}
-    </button>
-  )
-}
-
 function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
+  const {isLoading, run} = useAsync()
+  const inputRef = React.useRef(null)
+
+  function handeleSubmit(event) {
+    event.preventDefault()
+    run(
+      handleUpdateTodo({
+        ...editTodo,
+        data: {
+          ...editTodo.data,
+          text: event.target.elements[0].value,
+        },
+      }),
+    ).then(() => setEditTodo(null))
+  }
+
   return (
     <form
       className="flex items-center justify-between"
-      onSubmit={e => {
-        e.preventDefault()
-        handleUpdateTodo({
-          ...editTodo,
-          data: {
-            ...editTodo.data,
-            text: e.target.elements[0].value,
-          },
-        })
-        setEditTodo(null)
-      }}
+      onSubmit={handeleSubmit}
     >
       <input
+        ref={inputRef}
         className="border w-5/6 px-4"
         type="text"
         defaultValue={editTodo.data.text}
       />
       <div className="flex">
         <div>
-          <ActionButton type="submit" icon={SaveIcon} />
+          <AsyncButton
+            type="submit"
+            icon={SaveIcon}
+            isSubmitLoading={isLoading}
+          />
         </div>
         <div className="ml-4">
           {/* Exit out of edit mode */}
-          <ActionButton
+          <IconButton
             onClick={e => {
               setEditTodo(null)
             }}
@@ -65,7 +64,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
       <div className="flex">
         <div className="inline-block">
           {/* Toggle complete todo button */}
-          <ActionButton
+          <AsyncButton
             onClick={() =>
               handleUpdateTodo({
                 ...todo,
@@ -76,7 +75,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
               })
             }
             icon={todo.data.isCompleted ? CheckMarkIcon : null}
-            className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
+            className="bg-transparent text-blue-700 font-semibold hover:text-white border border-blue-500 focus:outline-none rounded-full h-6 w-6 flex items-center justify-center"
           />
         </div>
         <div
@@ -90,10 +89,15 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
       <div className="flex">
         <div>
           {/* Set todo to be edited */}
-          <ActionButton onClick={() => setEditTodo(todo)} icon={EditIcon} />
+          <IconButton
+            onClick={() => {
+              setEditTodo(todo)
+            }}
+            icon={EditIcon}
+          />
         </div>
         <div className="ml-4">
-          <ActionButton
+          <AsyncButton
             onClick={() => handleDeleteTodo(todo)}
             icon={DeleteIcon}
           />

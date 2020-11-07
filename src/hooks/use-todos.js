@@ -3,45 +3,46 @@ import {useAsync} from 'hooks/use-async'
 import {client} from 'utils/api-client'
 
 function useTodos() {
-  const {data: todos, run, isLoading, setData} = useAsync()
+  const {data: todos, run, isLoading} = useAsync()
+
+  const refetch = React.useCallback(
+    () =>
+      run(
+        client(`read-todos`).then(data => {
+          return data.todos
+        }),
+      ),
+    [run],
+  )
 
   React.useEffect(() => {
-    run(client(`read-todos`).then(data => data.todos))
-  }, [run])
+    refetch()
+  }, [refetch])
 
   function add(todoText) {
-    client(`create-todo`, {data: {text: todoText}}).then(data =>
-      setData([...todos, data]),
-    )
+    return client(`create-todo`, {data: {text: todoText}}).then(refetch)
   }
 
   function remove(todo) {
-    client(`delete-todo?id=${todo.ref['@ref'].id}`, {method: 'DELETE'}).then(
-      data => {
-        const todosAfterDelete = todos.filter(
-          t => t.ref['@ref'].id !== data.ref['@ref'].id,
-        )
-        setData(todosAfterDelete)
-      },
-    )
+    return client(`delete-todo?id=${todo.ref['@ref'].id}`, {
+      method: 'DELETE',
+    }).then(refetch)
   }
 
-  function update(todoForUpdate) {
-    client(`update-todo?id=${todoForUpdate.ref['@ref'].id}`, {
-      data: {...todoForUpdate.data},
+  function update(todo) {
+    return client(`update-todo?id=${todo.ref['@ref'].id}`, {
+      data: {...todo.data},
       method: 'PUT',
-    }).then(data => {
-      const todosAfterUpdate = todos.map(todo => {
-        if (todo.ref['@ref'].id === data.ref['@ref'].id) {
-          return todoForUpdate
-        }
-        return todo
-      })
-      setData(todosAfterUpdate)
-    })
+    }).then(refetch)
   }
 
-  return {todos, isLoading, add, update, remove}
+  return {
+    todos,
+    isLoading,
+    add,
+    update,
+    remove,
+  }
 }
 
 export {useTodos}

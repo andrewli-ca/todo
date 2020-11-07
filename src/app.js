@@ -6,7 +6,7 @@ import {useTodos} from 'hooks/use-todos'
 function App() {
   const {todos, add, update, remove, isLoading} = useTodos()
 
-  if (isLoading) {
+  if (!todos && isLoading) {
     return <div>loading..</div>
   }
 
