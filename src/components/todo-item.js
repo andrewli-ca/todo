@@ -46,12 +46,7 @@ function EditItem({editTodo, handleUpdateTodo, setEditTodo}) {
         </div>
         <div className="ml-4">
           {/* Exit out of edit mode */}
-          <IconButton
-            onClick={e => {
-              setEditTodo(null)
-            }}
-            icon={CloseIcon}
-          />
+          <IconButton onClick={() => setEditTodo(null)} icon={CloseIcon} />
         </div>
       </div>
     </form>
@@ -89,12 +84,7 @@ function ViewItem({todo, handleUpdateTodo, handleDeleteTodo, setEditTodo}) {
       <div className="flex">
         <div>
           {/* Set todo to be edited */}
-          <IconButton
-            onClick={() => {
-              setEditTodo(todo)
-            }}
-            icon={EditIcon}
-          />
+          <IconButton onClick={() => setEditTodo(todo)} icon={EditIcon} />
         </div>
         <div className="ml-4">
           <AsyncButton
