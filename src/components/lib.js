@@ -18,7 +18,7 @@ function IconButton({onClick, icon, ...rest}) {
       type="button"
       className="focus:outline-none"
       // if button type is submit, there is no onclick handler passed into props
-      onClick={() => (onClick ? onClick() : () => {})}
+      onClick={onClick ? onClick : () => {}}
       {...rest}
     >
       {icon ? <img src={icon} className="h-4" alt="lable" /> : null}
@@ -41,7 +41,7 @@ function AsyncButton({type, onClick, icon, isSubmitLoading, ...rest}) {
     <button
       type={type ? type : 'button'}
       className="focus:outline-none"
-      onClick={onClick && handleClick}
+      onClick={onClick ? handleClick : () => {}}
       {...rest}
     >
       {isLoading || isSubmitLoading ? (
